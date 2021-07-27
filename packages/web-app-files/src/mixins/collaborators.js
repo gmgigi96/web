@@ -63,7 +63,8 @@ export default {
       const collaboratorRoles = roles({
         $gettext,
         isFolder: isFolder,
-        allowSharePerm: !this.isOcis
+        allowSharePerm: !this.isOcis,
+        allowDenyPerm: this.highlightedFile.canDeny()
       })
       collaboratorRoles.push(this.advancedRole)
 
