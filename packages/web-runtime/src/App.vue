@@ -132,7 +132,6 @@ import TopBar from './components/TopBar.vue'
 import MessageBar from './components/MessageBar.vue'
 import SkipTo from './components/SkipTo.vue'
 import { FocusTrap } from 'focus-trap-vue'
-
 export default {
   components: {
     MessageBar,
@@ -162,7 +161,6 @@ export default {
     ]),
     applicationsList() {
       const list = []
-
       // Get extensions which have at least one nav item
       this.getExtensionsWithNavItems.forEach(extensionId => {
         list.push({
@@ -170,7 +168,6 @@ export default {
           type: 'extension'
         })
       })
-
       // Get extensions manually added into config
       this.configuration.applications.forEach(application => {
         list.push({
@@ -178,7 +175,6 @@ export default {
           type: 'link'
         })
       })
-
       return list
     },
     showHeader() {
@@ -187,75 +183,59 @@ export default {
     favicon() {
       return this.configuration.theme.logo.favicon
     },
-
     logoImage() {
       return this.configuration.theme.logo.sidebar
     },
-
     sidebarLogoAlt() {
       return this.$gettext('Navigate to all files page')
     },
-
     sidebarNavItems() {
       if (this.publicPage()) {
         return []
       }
-
       const items = this.getNavItemsByExtension(this.currentExtension)
       if (!items) {
         return []
       }
-
       items.filter(item => {
         if (this.capabilities === undefined) {
           return false
         }
-
         if (item.enabled === undefined) {
           return true
         }
-
         return item.enabled(this.capabilities)
       })
-
       return items.map(item => ({
         ...item,
         name: this.$gettext(item.name),
         active: this.$route.name === item.route.name
       }))
     },
-
     sidebarClasses() {
       if (this.appNavigationVisible) {
         return ''
       }
-
       return 'uk-visible@l'
     },
-
     isSidebarFixed() {
       return this.windowWidth <= 960
     },
-
     isSidebarVisible() {
-      if (this.sidebarNavItems.length === 0) {
+      if (this.sidebarNavItems.length === 0 || this.$route.fullPath.includes('/files/list/apps/')) {
         return false
       }
       return this.windowWidth >= 1200 || this.appNavigationVisible
     },
-
     appNavigationAnimation() {
       if (this.windowWidth > 1200) {
         return null
       }
-
       if (this.windowWidth > 960) {
         return 'push-right'
       }
-
       return 'fade'
     },
-
     selectedLanguage() {
       return this.getSettingsValue({
         extension: 'ocis-accounts',
@@ -278,7 +258,6 @@ export default {
         // capabilities not loaded yet
         return
       }
-
       // setup periodic loading of notifications if the server supports them
       if (caps.notifications) {
         this.$nextTick(() => {
@@ -303,17 +282,14 @@ export default {
       }
     }
   },
-
   beforeDestroy() {
     window.removeEventListener('resize', this.onResize)
   },
-
   destroyed() {
     if (this.$_notificationsInterval) {
       clearInterval(this.$_notificationsInterval)
     }
   },
-
   metaInfo() {
     const metaInfo = {}
     if (this.favicon) {
@@ -321,7 +297,6 @@ export default {
     }
     return metaInfo
   },
-
   mounted() {
     const _this = this
 
@@ -336,11 +311,9 @@ export default {
       this.onResize()
     })
   },
-
   beforeMount() {
     this.initAuth()
   },
-
   methods: {
     ...mapActions(['initAuth', 'fetchNotifications', 'deleteMessage', 'createModal', 'hideModal']),
 
@@ -380,69 +353,54 @@ export default {
         revert: event === 'beforeDestroy'
       })
     },
-
     hideAppNavigation() {
       this.appNavigationVisible = false
     },
-
     toggleAppNavigationVisibility() {
       this.appNavigationVisible = !this.appNavigationVisible
-
       if (this.appNavigationVisible) {
         this.$nextTick(() => {
           this.$refs.navigationSidebarLogo.$el.focus()
         })
       }
     },
-
     $_updateNotifications() {
       this.fetchNotifications(this.$client).catch(error => {
         console.error('Error while loading notifications: ', error)
         clearInterval(this.$_notificationsInterval)
       })
     },
-
     $_deleteMessage(item) {
       this.deleteMessage(item)
     },
-
     onResize() {
       const width = window.innerWidth
-
       // Reset navigation visibility in case of switching back to permanently visible sidebar
       if (width >= 1200) {
         this.appNavigationVisible = false
       }
-
       this.windowWidth = width
     },
-
     handleNavSwipe() {
       if (this.windowWidth <= 960 || this.windowWidth > 1200) {
         return
       }
-
       this.appNavigationVisible = false
     },
-
     announceRouteChange(route) {
       const pageTitle = this.extractPageTitleFromRoute(route, false)
       const translated = this.$gettext('Navigated to %{ pageTitle }')
       this.announcement = this.$gettextInterpolate(translated, { pageTitle })
     },
-
     extractPageTitleFromRoute(route, includeGeneralName = true) {
       const routeTitle = route.meta.title ? this.$gettext(route.meta.title) : route.name
       const titleSegments = [routeTitle]
-
       if (includeGeneralName) {
         titleSegments.push(this.configuration.theme.general.name)
       }
-
       if (route.params.item) {
         if (route.name.startsWith('files-')) {
           const fileTree = route.params.item.split('/').filter(el => el.length)
-
           if (fileTree.length) {
             titleSegments.unshift(fileTree.pop())
           }
@@ -450,7 +408,6 @@ export default {
           titleSegments.unshift(route.params.item)
         }
       }
-
       return titleSegments.join(' - ')
     }
   }
@@ -464,11 +421,9 @@ body,
   height: 100%;
   overflow-y: hidden;
 }
-
 #web {
   background-color: var(--oc-color-background-default);
 }
-
 #oc-topbar {
   position: sticky;
   top: 0;
@@ -476,7 +431,6 @@ body,
   z-index: 2;
   background-color: var(--oc-color-background-default);
 }
-
 .web-content-container {
   display: grid;
   grid-template-columns: 1fr;
@@ -486,23 +440,19 @@ body,
     'header'
     'main';
 }
-
 #main {
   position: relative;
   grid-area: main;
   overflow-y: auto;
 }
-
 #oc-header {
   grid-area: header;
 }
-
 .oc-app-navigation {
   position: sticky;
   top: 0;
   z-index: 1;
 }
-
 .loading-overlay {
   background-size: cover;
   background-repeat: no-repeat;
@@ -513,16 +463,13 @@ body,
   width: 100%;
   height: 100%;
 }
-
 .loading-overlay .oc-spinner {
   color: #0a264e;
 }
-
 .loading-overlay .oc-spinner:after {
   border: 10px solid;
   border-bottom: 10px solid transparent;
 }
-
 @media only screen and (max-width: 960px) {
   #web-nav-sidebar {
     height: 100%;
@@ -533,7 +480,6 @@ body,
     z-index: 3;
   }
 }
-
 .web-sidebar-btn-close {
   position: absolute;
   right: var(--oc-space-medium);
