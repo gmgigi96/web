@@ -68,6 +68,7 @@
   "psd": "image",
   "py": "text-code",
   "rar": "package-x-generic",
+  "root": "root",
   "rss": "file",
   "sh-lib": "text-code",
   "sh": "text-code",
